@@ -1,0 +1,15 @@
+{
+  "title": "O Tannenbaum",
+  "audio": "audio/oh_tannenbaum.mp3",
+  "image": "images/tree.jpg",
+  "lines": [
+    { "text": "O Tannenbaum, o Tannenbaum, Wie grün sind deine Blätter!", "start": 0  },
+    { "text": "Du grünst nicht nur zur Sommerzeit,",                      "start": 12 },
+    { "text": "Nein, auch im Winter, wenn es schneit.",                   "start": 16 },
+    { "text": "O Tannenbaum, o Tannenbaum, Wie grün sind deine Blätter!", "start": 22 },
+    { "text": "O Tannenbaum, o Tannenbaum, Du kannst mir sehr gefallen!", "start": 35 },
+    { "text": "Wie oft hat schon zur Winterszeit",                        "start": 47 },
+    { "text": "Ein Baum von dir mich hoch erfreut!",                      "start": 52 },
+    { "text": "O Tannenbaum, o Tannenbaum, Du kannst mir sehr gefallen!", "start": 57 }
+  ]
+}

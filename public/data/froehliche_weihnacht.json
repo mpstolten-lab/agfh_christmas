@@ -1,0 +1,18 @@
+{
+  "title": "Fröhliche Weihnacht überall",
+  "audio": "audio/froehliche_weihnacht.mp3",
+  "image": "",
+  "lines": [
+    { "text": "Fröhliche Weihnacht überall!",           "start": 9   },
+    { "text": "tönet durch die Lüfte froher Schall.",      "start": 12  },
+    { "text": "Weihnachtston, Weihnachtsbaum,",              "start": 16  },
+    { "text": "Weihnachtsduft in jedem Raum!",              "start": 19  },
+    { "text": "Fröhliche Weihnacht überall!",           "start": 23  },
+    { "text": "tönet durch die Lüfte froher Schall.",      "start": 26  },
+    { "text": "Darum alle",                          "start": 30 },
+    { "text": "stimmet in den Jubelton,",             "start": 31 },
+    { "text": "denn es kommt das Licht der Welt",     "start": 37 },
+    { "text": "von des Vaters Thron.",                "start": 42 }
+    
+  ]
+}

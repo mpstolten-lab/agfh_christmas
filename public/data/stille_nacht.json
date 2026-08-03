@@ -1,0 +1,27 @@
+{
+  "title": "Stille Nacht",
+  "audio": "audio/stille_nacht.mp3",
+  "image": "",
+  "lines": [
+    { "text": "Stille Nacht, heilige Nacht!",              "start": 5   },
+    { "text": "Alles schläft, einsam wacht",               "start": 10   },
+    { "text": "Nur das traute, hochheilige Paar.",         "start": 15  },
+    { "text": "Holder Knabe im lockigen Haar,",            "start": 20  },
+    { "text": "Schlaf in himmlischer Ruh,",                "start": 25  },
+    { "text": "Schlaf in himmlischer Ruh.",                "start": 30  },
+
+    { "text": "Stille Nacht, heilige Nacht!",              "start": 35  },
+    { "text": "Gottes Sohn, o wie lacht",                  "start": 40  },
+    { "text": "Lieb aus deinem göttlichen Mund,",          "start": 46  },
+    { "text": "Da uns schlägt die rettende Stund,",        "start": 51  },
+    { "text": "Christ, in deiner Geburt,",                 "start": 56  },
+    { "text": "Christ, in deiner Geburt.",                 "start": 61  },
+
+    { "text": "Stille Nacht, heilige Nacht!",              "start": 66  },
+    { "text": "Hirten erst kundgemacht,",                  "start": 71  },
+    { "text": "Durch der Engel Halleluja.",                "start": 76  },
+    { "text": "Tönt es laut von fern und nah:",            "start": 81  },
+    { "text": "Christ, der Retter ist da,",                "start": 87  },
+    { "text": "Christ, der Retter ist da!",                "start": 92  }
+  ]
+}

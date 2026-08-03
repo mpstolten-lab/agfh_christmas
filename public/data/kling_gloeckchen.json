@@ -1,0 +1,37 @@
+{
+  "title": "Kling Glöckchen",
+  "audio": "audio/kling_gloeckchen.mp3",
+  "image": "",
+  "lines": [
+    { "text": "Kling, Glöckchen, klingelingeling,",   "start": 5   },
+    { "text": "kling, Glöckchen, kling!",              "start": 8   },
+    { "text": "Laßt mich ein, ihr Kinder,",            "start": 11  },
+    { "text": "ist so kalt der Winter,",               "start": 14  },
+    { "text": "öffnet mir die Türen,",                 "start": 17  },
+    { "text": "laßt mich nicht erfrieren!",            "start": 20  },
+    { "text": "Kling, Glöckchen, klingelingeling,",   "start": 23  },
+    { "text": "kling, Glöckchen, kling!",              "start": 26  },
+
+    { "text": "Kling, Glöckchen, klingelingeling,",   "start": 30  },
+    { "text": "Kling, Glöckchen, kling!",              "start": 32  },
+    { "text": "Kling, Glöckchen, klingelingeling,",   "start": 35  },
+    { "text": "Kling, Glöckchen, kling!",              "start": 38  },
+    { "text": "Mädchen, hört, und Bübchen,",           "start": 41  },
+    { "text": "macht mir auf das Stübchen,",           "start": 44  },
+    { "text": "bring euch viele Gaben,",               "start": 47  },
+    { "text": "sollt euch dran erlaben.",              "start": 50  },
+    { "text": "Kling, Glöckchen, klingelingeling,",   "start": 53  },
+    { "text": "kling, Glöckchen, kling!",              "start": 56  },
+
+    { "text": "Kling, Glöckchen, klingelingeling,",   "start": 60  },
+    { "text": "kling, Glöckchen, kling!",              "start": 62  },
+    { "text": "Kling, Glöckchen, klingelingeling,",   "start": 65  },
+    { "text": "kling, Glöckchen, kling!",              "start": 68 },
+    { "text": "Hell erglühn die Kerzen,",              "start": 71  },
+    { "text": "öffnet mir die Herzen!",                "start": 74  },
+    { "text": "Will drin wohnen fröhlich,",            "start": 77  },
+    { "text": "frommes Kind, wie selig.",               "start": 80  },
+    { "text": "Kling, Glöckchen, klingelingeling,",   "start": 82  },
+    { "text": "kling, Glöckchen, kling!",              "start": 86  }
+  ]
+}

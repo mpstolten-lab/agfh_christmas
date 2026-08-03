@@ -1,0 +1,36 @@
+{
+  "title": "Ihr Kinderlein, kommet",
+  "audio": "audio/ihr_kinderlein.mp3",
+  "image": "",
+  "lines": [
+    { "text": "Ihr Kinderlein, kommet, o kommet doch all!",           "start": 3   },
+    { "text": "Zur Krippe her kommet in Bethlehems Stall",            "start": 10  },
+    { "text": "und seht, was in dieser hochheiligen Nacht",           "start": 16  },
+    { "text": "der Vater im Himmel für Freude uns macht!",            "start": 23  },
+
+    { "text": "O seht in der Krippe im nächtlichen Stall,",           "start": 31  },
+    { "text": "seht hier bei des Lichtleins hell glänzendem Strahl",  "start": 38  },
+    { "text": "den reinliche Windeln, das himmlische Kind,",          "start": 45  },
+    { "text": "viel schöner und holder als Engel es sind!",          "start": 52  },
+
+    { "text": "Da liegt es, das Kindlein, auf Heu und auf Stroh,",    "start": 60  },
+    { "text": "Maria und Josef betrachten es froh.",                 "start": 67  },
+    { "text": "Die redlichen Hirten knien betend davor,",            "start": 74  },
+    { "text": "hoch oben schwebt jubelnd der Engelein Chor.",         "start": 81  },
+
+    { "text": "O beugt wie die Hirten anbetend die Knie,",           "start": 89  },
+    { "text": "erhebet die Hände und danket wie sie!",               "start": 95 },
+    { "text": "Stimmt freudig, ihr Kinder, wer wollt sich nicht freun,", "start": 103 },
+    { "text": "stimmt freudig zum Jubel der Engel mit ein!",         "start": 109 },
+
+    { "text": "O betet: Du liebes, du göttliches Kind,",             "start": 117 },
+    { "text": "was leidest du alles für unsere Sünd!",               "start": 124 },
+    { "text": "Ach hier in der Krippe schon Armut und Not,",         "start": 131 },
+    { "text": "am Kreuze dort gar noch den bitteren Tod.",           "start": 138 },
+
+    { "text": "So nimm unsre Herzen zum Opfer denn hin;",            "start": 146 },
+    { "text": "wir geben sie gerne mit fröhlichem Sinn.",            "start": 153 },
+    { "text": "Ach mache sie heilig und selig wie Deins",            "start": 160 },
+    { "text": "und mach sie auf ewig mit Deinem nur eins.",          "start": 167 }
+  ]
+}

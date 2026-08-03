@@ -1,0 +1,36 @@
+{
+  "title": "Lasst uns froh und munter sein",
+  "audio": "audio/lasst_uns_froh.mp3",
+  "image": "",
+  "lines": [
+    { "text": "Lasst uns froh und munter sein,",           "start": 6   },
+    { "text": "und uns recht von Herzen freun!",           "start": 9   },
+    { "text": "Lustig, lustig, traleralera!",               "start": 12   },
+    { "text": "Bald ist Nikolaus Abend da,",                "start": 15  },
+    { "text": "bald ist Nikolaus Abend da!",                "start": 18  },
+
+    { "text": "Dann stell ich den Teller auf,",             "start": 21  },
+    { "text": "Nik'laus legt gewiß was drauf.",             "start": 23  },
+    { "text": "Lustig, lustig, traleralera!",               "start": 26  },
+    { "text": "Bald ist Nikolaus Abend da,",                "start": 30  },
+    { "text": "bald ist Nikolaus Abend da!",                "start": 33  },
+
+    { "text": "Wenn ich schlaf, dann träume ich,",         "start": 36  },
+    { "text": "jetzt bringt Nik'laus was für mich.",       "start": 39  },
+    { "text": "Lustig, lustig, traleralera!",               "start": 42  },
+    { "text": "Bald ist Nikolaus Abend da,",                "start": 45  },
+    { "text": "bald ist Nikolaus Abend da!",                "start": 48  },
+
+    { "text": "Wenn ich aufgestanden bin,",                "start": 51  },
+    { "text": "lauf ich schnell zu dem Teller hin.",       "start": 54  },
+    { "text": "Lustig, lustig, traleralera!",               "start": 58  },
+    { "text": "Bald ist Nikolaus Abend da,",                "start": 61  },
+    { "text": "bald ist Nikolaus Abend da!",                "start": 64  },
+
+    { "text": "Nik'laus ist ein guter Mann,",              "start": 66  },
+    { "text": "dem man nicht genug danken kann!",          "start": 70  },
+    { "text": "Lustig, lustig, traleralera!",               "start": 73  },
+    { "text": "Bald ist Nikolaus Abend da,",                "start": 76  },
+    { "text": "bald ist Nikolaus Abend da!",                "start": 79  }
+  ]
+}

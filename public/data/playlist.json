@@ -1,0 +1,13 @@
+{
+  "songs": [
+    { "title": "O Tannenbaum",                       "file": "data/oh_tannenbaum.json",                "duration": 73  },
+    { "title": "We Wish You a Merry Christmas",      "file": "data/we_wish_you.json",                  "duration": 90  },
+    { "title": "Ihr Kinderlein, kommet",              "file": "data/ihr_kinderlein.json",               "duration": 179 },
+    { "title": "Stille Nacht",                        "file": "data/stille_nacht.json",                 "duration": 100 },
+    { "title": "Kling Glöckchen",                     "file": "data/kling_gloeckchen.json",             "duration": 92  },
+    { "title": "Feliz Navidad",                       "file": "data/feliz_navidad.json",                "duration": 171 },
+    { "title": "O Du Fröhliche",                      "file": "data/oh_du_froehliche.json",             "duration": 131 },
+    { "title": "Lasst uns froh und munter sein",      "file": "data/lasst_uns_froh.json",               "duration": 86  },
+    { "title": "Fröhliche Weihnacht überall",         "file": "data/froehliche_weihnacht.json",         "duration": 49 }
+  ]
+}

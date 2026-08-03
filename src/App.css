@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* index.css setzt html einen eigenen Hintergrund und boxt #root auf 1126px ein
+   (Vite-Demo-Layout) - hier fuer die Weihnachtssingen-Seite ueberschrieben,
+   ohne index.css selbst anzufassen. */
+:root {
+  background: transparent;
+}
+
+#root {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  border-inline: none;
+}
+
+body {
+  font-family: 'Elms Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: rgb(15, 37, 21);
+  color: white;
+}
+
+.line {
+  font-size: 1rem;
+  color: #aeaeae;
+  padding: 0.4rem 0;
+  transition: color 0.3s, font-size 0.3s, opacity 0.3s, max-height 0.3s;
+  opacity: 0;
+  max-height: 0;
+  margin-bottom: 0.9rem;
+}
+
+.line.active {
+  font-size: 1.2rem;
+  color: #ffffff;
+  font-weight: bold;
+  max-height: 100px;
+  overflow: hidden;
+}
+
+audio {
+  margin-top: 1rem;
+  width: 100%;
+  display: none;
+}
+
+#start_screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 30px;
+  box-shadow: 0 0 40px 40px rgba(0, 0, 0, 0.6);
+  padding: 1.5rem;
+}
+
+#agfh_logo {
+  display: block;
+  max-width: 320px;
+  width: 70%;
+  height: auto;
+  margin: 0 auto 1rem;
+}
+
+#welcome_text {
+  height: 30px;
+  font-size: 25px;
+  text-align: center;
+  border: none;
+  margin: 0 0 1rem;
+}
+
+#startbutton {
+  width: 170px;
+  height: 55px;
+  background: repeating-linear-gradient(45deg, #6c0000, #cc0000 10px, white 10px, white 20px);
+  color: white;
+  text-shadow: 1px 1px 3px #480000, -1px -1px 3px #480000;
+  font-weight: 700;
+  font-size: 25px;
+  border: 2px solid #480000;
+  cursor: pointer;
+  font-family: 'Elms Sans', sans-serif;
+  border-radius: 25px;
+}
+
+#countdown {
+  font-size: 2rem;
+  font-family: sans-serif;
+  box-shadow: 0 0 30px 20px rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+#firstpicture {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+  transition: opacity 2s ease;
+}
+
+#container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+#title,
+h2,
+#lyrics {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 0 40px 40px rgba(0, 0, 0, 0.6);
+  width: 100%;
+  max-width: 800px;
+  box-sizing: border-box;
+}
+
+#title,
+h2 {
+  min-height: 1rem;
+}
+
+#lyrics {
+  min-height: 320px;
+}
+
+#end {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 0 40px 40px rgba(0, 0, 0, 0.6);
+}

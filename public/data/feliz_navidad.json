@@ -1,0 +1,66 @@
+{
+  "title": "Feliz Navidad",
+  "audio": "audio/feliz_navidad.mp3",
+  "image": "",
+  "lines": [
+    { "text": "Feliz Navidad",                                  "start": 8   },
+    { "text": "Feliz Navidad",                                  "start": 11  },
+    { "text": "Feliz Navidad",                                  "start": 15  },
+    { "text": "Próspero año y Felicidad.",                       "start": 16  },
+
+    { "text": "Feliz Navidad",                                  "start": 20  },
+    { "text": "Feliz Navidad",                                  "start": 25  },
+    { "text": "Feliz Navidad",                                  "start": 28  },
+    { "text": "Próspero año y Felicidad.",                       "start": 30  },
+
+    { "text": "I wanna wish you a Merry Christmas",             "start": 34  },
+    { "text": "I wanna wish you a Merry Christmas",             "start": 37  },
+    { "text": "I wanna wish you a Merry Christmas",             "start": 40 },
+    { "text": "From the bottom of my heart.",                    "start": 42 },
+
+    { "text": "I wanna wish you a Merry Christmas",             "start": 47 },
+    { "text": "I wanna wish you a Merry Christmas",             "start": 50 },
+    { "text": "I wanna wish you a Merry Christmas",             "start": 54 },
+    { "text": "From the bottom of my heart",                     "start": 56 },
+
+    { "text": "Feliz Navidad",                                  "start": 61   },
+    { "text": "Feliz Navidad",                                  "start": 64  },
+    { "text": "Feliz Navidad",                                  "start": 67  },
+    { "text": "Próspero año y Felicidad.",                       "start": 69  },
+
+    { "text": "Feliz Navidad",                                  "start": 74  },
+    { "text": "Feliz Navidad",                                  "start": 77 },
+    { "text": "Feliz Navidad",                                  "start": 80  },
+    { "text": "Próspero año y Felicidad.",                       "start": 82  },
+
+    { "text": "I wanna wish you a Merry Christmas",             "start": 86  },
+    { "text": "I wanna wish you a Merry Christmas",             "start": 90  },
+    { "text": "I wanna wish you a Merry Christmas",             "start": 93 },
+    { "text": "From the bottom of my heart.",                    "start": 96 },
+
+    { "text": "I wanna wish you a Merry Christmas",             "start": 99 },
+    { "text": "I wanna wish you a Merry Christmas",             "start": 103 },
+    { "text": "I wanna wish you a Merry Christmas",             "start": 106 },
+    { "text": "From the bottom of my heart",                     "start": 109 },
+
+    { "text": "Feliz Navidad",                                  "start": 113   },
+    { "text": "Feliz Navidad",                                  "start": 116  },
+    { "text": "Feliz Navidad",                                  "start": 120  },
+    { "text": "Próspero año y Felicidad.",                       "start": 122 },
+
+    { "text": "Feliz Navidad",                                  "start": 126  },
+    { "text": "Feliz Navidad",                                  "start": 130 },
+    { "text": "Feliz Navidad",                                  "start": 133  },
+    { "text": "Próspero año y Felicidad.",                       "start": 135  },
+
+    { "text": "I wanna wish you a Merry Christmas",             "start": 139  },
+    { "text": "I wanna wish you a Merry Christmas",             "start": 141  },
+    { "text": "I wanna wish you a Merry Christmas",             "start": 145 },
+    { "text": "From the bottom of my heart.",                    "start": 148 },
+
+    { "text": "I wanna wish you a Merry Christmas",             "start": 152 },
+    { "text": "I wanna wish you a Merry Christmas",             "start": 155 },
+    { "text": "I wanna wish you a Merry Christmas",             "start": 159 },
+    { "text": "From the bottom of my heart",                     "start": 161 }
+  ]
+}

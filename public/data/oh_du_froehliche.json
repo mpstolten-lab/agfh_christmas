@@ -1,0 +1,21 @@
+{
+  "title": "O Du Fröhliche",
+  "audio": "audio/oh_du_froehliche.mp3",
+  "image": "",
+  "lines": [
+    { "text": "O du fröhliche, o du selige,",              "start": 0   },
+    { "text": "gnadenbringende Weihnachtszeit!",           "start": 10  },
+    { "text": "Welt ging verloren, Christ ist geboren:",   "start": 21  },
+    { "text": "Freue, freue dich, o Christenheit!",         "start": 31  },
+
+    { "text": "O du fröhliche, o du selige,",              "start": 42  },
+    { "text": "gnadenbringende Weihnachtszeit!",           "start": 53  },
+    { "text": "Christ ist erschienen, uns zu versühnen:",  "start": 63  },
+    { "text": "Freue, freue dich, o Christenheit!",         "start": 74  },
+
+    { "text": "O du fröhliche, o du selige,",              "start": 85  },
+    { "text": "gnadenbringende Weihnachtszeit!",           "start": 96 },
+    { "text": "Himmlische Heere jauchzen Dir Ehre:",       "start": 106 },
+    { "text": "Freue, freue dich, o Christenheit!",         "start": 117 }
+  ]
+}
