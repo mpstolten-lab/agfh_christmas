@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import "./App.css";
 
-const eventDate = new Date("August 03, 2026 08:25:00").getTime();
+const eventDate = new Date("August 07, 2026 07:30:00").getTime();
 const GAP_SECONDS = 20;
+const BASE_URL = import.meta.env.BASE_URL;
 
 function App() {
   const [started, setStarted] = useState(false);                // Startbutton 
@@ -19,9 +20,19 @@ function App() {
   const scheduledStartRef = useRef(eventDate);
   const songsRef = useRef([]); 
 
-  // 1. Loadplaylist an set starting time
+  // 1. Load Song details and time
+  const loadSong = useCallback(async (index) => {
+    const list = songsRef.current;
+    const response = await fetch(`${BASE_URL}${list[index].file}`);
+    const data = await response.json();
+    setSongData(data);
+    setCurrentLine(-1);
+    setGapCountdown(null);
+  }, []);
+
+  // 2. Loadplaylist an set starting time
   const loadPlaylist = useCallback(async () => {
-    const response = await fetch("/data/playlist.json");
+    const response = await fetch(`${BASE_URL}data/playlist.json`);
     const playlist = await response.json();
     songsRef.current = playlist.songs;
     setSongs(playlist.songs);
@@ -49,17 +60,7 @@ function App() {
     scheduledStartRef.current = scheduledStart;
     setCurrentSongIndex(index);
     loadSong(index);
-  }, []);
-
-  // 2. Load Song details and time
-  const loadSong = useCallback(async (index) => {
-    const list = songsRef.current;
-    const response = await fetch(`/${list[index].file}`);
-    const data = await response.json();
-    setSongData(data);
-    setCurrentLine(-1);
-    setGapCountdown(null);
-  }, []);
+  }, [loadSong]);
 
   // Wird ausgelöst, sobald der Browser die Dauer der Audiodatei kennt
   const handleLoadedMetadata = () => {
@@ -149,14 +150,22 @@ function App() {
     <div id="container">
       <img
         id="firstpicture"
-        src={songData?.image || "/images/red_tree.jpg"}
+        src={
+          songData?.image
+            ? `${BASE_URL}${songData.image}`
+            : `${BASE_URL}images/red_tree.jpg`
+        }
         alt=""
       />
 
 {/* shown when started is false, the ids are needed für CSS styling */}
       {!started && (
         <div id="start_screen">
-          <img id="agfh_logo" src="/images/agfh_logo.png" alt="AGFH Logo" />
+          <img
+            id="agfh_logo"
+            src={`${BASE_URL}images/agfh_logo.png`}
+            alt="AGFH Logo"
+          />
           <p id="welcome_text">Willkommen zum Weihnachtssingen!</p>
           <button id="startbutton" onClick={handleStartClick}>
             Bereit
@@ -203,7 +212,7 @@ function App() {
       {/* audio component */}
       <audio
         ref={audioRef}
-        src={songData?.audio ? `/${songData.audio}` : undefined}
+        src={songData?.audio ? `${BASE_URL}${songData.audio}` : undefined}
         onLoadedMetadata={handleLoadedMetadata}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}

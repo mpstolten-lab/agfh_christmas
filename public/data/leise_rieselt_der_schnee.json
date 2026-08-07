@@ -1,0 +1,21 @@
+{
+  "title": "Leise rieselt der Schnee",
+  "audio": "audio/leise_rieselt_der_schnee.mp3",
+  "image": "",
+  "lines": [
+    { "text": "Leise rieselt der Schnee,",        "start":  16  },
+    { "text": "still und starr ruht der See,",    "start": 24   },
+    { "text": "weihnachtlich glänzet der Wald:",  "start": 32  },
+    { "text": "Freue dich, ’s Christkind kommt bald!", "start": 40 },
+
+    { "text": "In den Herzen ist’s warm,",         "start": 49  },
+    { "text": "still schweigt Kummer und Harm,",   "start": 57  },
+    { "text": "Sorge des Lebens verhallt:",        "start": 64  },
+    { "text": "Freue dich, ’s Christkind kommt bald!", "start": 72 },
+
+    { "text": "Bald ist heilige Nacht,",           "start": 80  },
+    { "text": "Chor der Engel erwacht,",           "start": 88  },
+    { "text": "hört nur, wie lieblich es schallt:", "start": 97 },
+    { "text": "Freue dich, ’s Christkind kommt bald!", "start": 104 }
+  ]
+}

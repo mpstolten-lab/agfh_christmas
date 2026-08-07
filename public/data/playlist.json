@@ -8,6 +8,7 @@
     { "title": "Feliz Navidad",                       "file": "data/feliz_navidad.json",                "duration": 171 },
     { "title": "O Du Fröhliche",                      "file": "data/oh_du_froehliche.json",             "duration": 131 },
     { "title": "Lasst uns froh und munter sein",      "file": "data/lasst_uns_froh.json",               "duration": 86  },
-    { "title": "Fröhliche Weihnacht überall",         "file": "data/froehliche_weihnacht.json",         "duration": 49 }
+    { "title": "Fröhliche Weihnacht überall",         "file": "data/froehliche_weihnacht.json",         "duration": 49 },
+    { "title": "Leise rieselt der Schnee",            "file": "data/leise_rieselt_der_schnee.json",     "duration": 136 }
   ]
 }
