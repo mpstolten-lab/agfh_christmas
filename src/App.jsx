@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import "./App.css";
 
-const eventDate = new Date("August 07, 2026 14:55:00").getTime();
+const eventDate = new Date("August 07, 2026 15:25:00").getTime();
 const GAP_SECONDS = 20;
 const BASE_URL = import.meta.env.BASE_URL;
 
