@@ -1,7 +1,6 @@
 {
   "title": "Stille Nacht",
   "audio": "audio/stille_nacht.mp3",
-  "image": "",
   "lines": [
     { "text": "Stille Nacht, heilige Nacht!",              "start": 5   },
     { "text": "Alles schläft, einsam wacht",               "start": 10   },

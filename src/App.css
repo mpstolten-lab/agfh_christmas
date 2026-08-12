@@ -5,6 +5,7 @@
    ohne index.css selbst anzufassen. */
 :root {
   background: transparent;
+  font-size: 18px;
 }
 
 #root {
@@ -65,22 +66,27 @@ audio {
 }
 
 #welcome_text {
-  height: 30px;
   font-size: 25px;
   text-align: center;
   border: none;
   margin: 0 0 1rem;
 }
 
+@media (max-width: 480px) {
+  #welcome_text {
+    font-size: 20px;
+  }
+}
+
 #startbutton {
   width: 170px;
   height: 55px;
-  background: repeating-linear-gradient(45deg, #6c0000, #cc0000 10px, white 10px, white 20px);
+  background: #c81f28;
   color: white;
-  text-shadow: 1px 1px 3px #480000, -1px -1px 3px #480000;
+  text-shadow: 2px 2px 6px #3a0000, -2px -2px 6px #3a0000;
   font-weight: 700;
   font-size: 25px;
-  border: 2px solid #480000;
+  border: 2px solid #6c0000;
   cursor: pointer;
   font-family: 'Elms Sans', sans-serif;
   border-radius: 25px;
@@ -99,6 +105,7 @@ audio {
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100svh;
   object-fit: cover;
   z-index: -1;
   transition: opacity 2s ease;
@@ -110,13 +117,15 @@ audio {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  min-height: 100svh;
   padding: 1rem;
   box-sizing: border-box;
 }
 
 #title,
 h2,
-#lyrics {
+#lyrics,
+#playlist_preview {
   background-color: rgba(0, 0, 0, 0.6);
   padding: 1rem;
   border-radius: 10px;
@@ -129,10 +138,40 @@ h2,
 #title,
 h2 {
   min-height: 1rem;
+  color: white;
+  font-family: 'Elms Sans', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 
 #lyrics {
   min-height: 320px;
+}
+
+.playlist_heading {
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+  font-family: 'Elms Sans', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: normal;
+  color: white;
+}
+
+#playlist_preview {
+  margin-top: 0;
+}
+
+#playlist_preview ol {
+  margin: 0 auto;
+  padding-left: 1.5rem;
+  text-align: left;
+  width: fit-content;
+  max-width: 100%;
+}
+
+#playlist_preview li {
+  padding: 0.3rem 0;
 }
 
 #end {

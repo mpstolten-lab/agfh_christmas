@@ -1,7 +1,6 @@
 {
   "title": "Ihr Kinderlein, kommet",
   "audio": "audio/ihr_kinderlein.mp3",
-  "image": "",
   "lines": [
     { "text": "Ihr Kinderlein, kommet, o kommet doch all!",           "start": 3   },
     { "text": "Zur Krippe her kommet in Bethlehems Stall",            "start": 10  },

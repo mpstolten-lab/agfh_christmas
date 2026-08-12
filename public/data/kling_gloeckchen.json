@@ -1,7 +1,6 @@
 {
   "title": "Kling Glöckchen",
   "audio": "audio/kling_gloeckchen.mp3",
-  "image": "",
   "lines": [
     { "text": "Kling, Glöckchen, klingelingeling,",   "start": 5   },
     { "text": "kling, Glöckchen, kling!",              "start": 8   },

@@ -1,26 +1,32 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import "./App.css";
 
-const eventDate = new Date("August 07, 2026 15:25:00").getTime();
-const GAP_SECONDS = 20;
+const eventDate = new Date("August 12, 2026 14:00:00").getTime();
+const GAP_SECONDS = 25;
+
+const SOFT_DRIFT_SECONDS = 0.3;        // threshold above which playback rate is gently adjusted
+const NUDGE_RATE_PER_SECOND = 0.03;    // playback rate adjustment per second of drift
+const MAX_NUDGE_RATE = 0.06;           // cap so the adjustment stays unnoticeable
+const RESYNC_INTERVAL_MS = 1000;       // how often the playback position is checked
+
 const BASE_URL = import.meta.env.BASE_URL;
 
 function App() {
-  const [started, setStarted] = useState(false);                // Startbutton 
-  const [countdownText, setCountdownText] = useState("");       //Countdown
-  const [songs, setSongs] = useState([]);
-  const [currentSongIndex, setCurrentSongIndex] = useState(0);
-  const [songData, setSongData] = useState(null);               // geladene JSON des aktuellen Songs
-  const [currentLine, setCurrentLine] = useState(-1);
-  const [showEnd, setShowEnd] = useState(false);
-  const [gapCountdown, setGapCountdown] = useState(null);       // null = keine Pause aktiv
+  const [started, setStarted] = useState(false);                // true once the start button was clicked
+  const [countdownText, setCountdownText] = useState("");       // formatted countdown text until eventDate
+  const [songs, setSongs] = useState([]);                       // full playlist, for the title list display
+  const [currentSongIndex, setCurrentSongIndex] = useState(0);  // index of the song currently playing
+  const [songData, setSongData] = useState(null);               // loaded JSON (lyrics/audio) of the current song
+  const [currentLine, setCurrentLine] = useState(-1);            // index of the currently highlighted lyric line
+  const [showEnd, setShowEnd] = useState(false);                // true once the playlist is finished
+  const [gapCountdown, setGapCountdown] = useState(null);       // seconds left in the break; null = no break active
 
   // references
-  const audioRef = useRef(null);
-  const scheduledStartRef = useRef(eventDate);
-  const songsRef = useRef([]); 
+  const audioRef = useRef(null);                    // the <audio> DOM element
+  const scheduledStartRef = useRef(eventDate);       // shared start time of the current song
+  const songsRef = useRef([]);                       // playlist, kept in sync with `songs` for use in callbacks
 
-  // 1. Load Song details and time
+  // Fetches the data (lyrics/audio) for a song and resets line/gap state
   const loadSong = useCallback(async (index) => {
     const list = songsRef.current;
     const response = await fetch(`${BASE_URL}${list[index].file}`);
@@ -30,7 +36,7 @@ function App() {
     setGapCountdown(null);
   }, []);
 
-  // 2. Loadplaylist an set starting time
+  // Loads the playlist and figures out which song should be playing right now
   const loadPlaylist = useCallback(async () => {
     const response = await fetch(`${BASE_URL}data/playlist.json`);
     const playlist = await response.json();
@@ -41,8 +47,7 @@ function App() {
     let index = 0;
     const list = playlist.songs;
 
-
-      //
+    // advance until we reach the song that should currently be playing
     while (
       index < list.length - 1 &&
       Date.now() >= scheduledStart + (list[index].duration + GAP_SECONDS) * 1000
@@ -51,7 +56,7 @@ function App() {
       index++;
     }
 
-    // if last song is over show endscreen
+    // if the last song is already over, show the end screen
     if (Date.now() >= scheduledStart + list[index].duration * 1000) {
       setShowEnd(true);
       return;
@@ -62,22 +67,33 @@ function App() {
     loadSong(index);
   }, [loadSong]);
 
-  // Wird ausgelöst, sobald der Browser die Dauer der Audiodatei kennt
+  // Calculates where in the song we should be right now, based on the shared start time
+  const getExpectedTime = useCallback(() => {
+    const list = songsRef.current;
+    const duration = list[currentSongIndex]?.duration ?? Infinity;
+    return Math.max(
+      0,
+      Math.min((Date.now() - scheduledStartRef.current) / 1000, duration),
+    );
+  }, [currentSongIndex]);
+
+  // Fires once the audio duration is known; jumps to the expected position and plays
   const handleLoadedMetadata = () => {
     const audio = audioRef.current;
-    const list = songsRef.current;
-    const secondsIntoSong = Math.max(
-      0,
-      Math.min(
-        (Date.now() - scheduledStartRef.current) / 1000,
-        list[currentSongIndex].duration,
-      ),
-    );
-    audio.currentTime = secondsIntoSong;
+    audio.currentTime = getExpectedTime();
     audio.play();
   };
 
-  // Show current line
+  // Fires once audio is actually playing; re-adjusts currentTime 
+  const handlePlaying = () => {
+    const audio = audioRef.current;
+    const expected = getExpectedTime();
+    if (Math.abs(audio.currentTime - expected) > SOFT_DRIFT_SECONDS) {
+      audio.currentTime = expected;
+    }
+  };
+
+  // Updates which lyric line is currently highlighted based on playback time
   const handleTimeUpdate = () => {
     if (!songData) return;
     const t = audioRef.current.currentTime;
@@ -85,7 +101,29 @@ function App() {
     setCurrentLine(idx);
   };
 
+  // re-sync
+  useEffect(() => {
+    if (!songData) return;
 
+    const interval = setInterval(() => {
+      const audio = audioRef.current;
+      if (!audio || audio.paused) return;
+      const expected = getExpectedTime();
+      const drift = audio.currentTime - expected; // >0: too far ahead, <0: behind
+
+      if (Math.abs(drift) > SOFT_DRIFT_SECONDS) {
+        const nudge = Math.min(Math.abs(drift) * NUDGE_RATE_PER_SECOND, MAX_NUDGE_RATE);
+        audio.playbackRate = drift > 0 ? 1 - nudge : 1 + nudge;
+      } else {
+        audio.playbackRate = 1;
+      }
+    }, RESYNC_INTERVAL_MS);
+
+    return () => clearInterval(interval);
+  }, [songData, getExpectedTime]);
+
+
+  // starts the gap countdown, then loads the next song or shows the end screen
   const handleEnded = () => {
     const next = currentSongIndex + 1;
     const list = songsRef.current;
@@ -113,9 +151,15 @@ function App() {
     }
   };
 
-  // 3. Countdown bis eventDate, nach Klick auf Start
+  // Runs the countdown to eventDate after clicking Start
   const handleStartClick = () => {
     setStarted(true);
+
+    // Load the playlist already now, just to display the titles during the countdown
+    fetch(`${BASE_URL}data/playlist.json`)
+      .then((response) => response.json())
+      .then((playlist) => setSongs(playlist.songs));
+
     const x = setInterval(() => {
       const distance = eventDate - Date.now();
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -134,7 +178,7 @@ function App() {
     }, 1000);
   };
 
-  // visibilitychange: Resync nach Rückkehr aus dem Hintergrund
+  // Re-syncs playback when the tab returns from the background
   useEffect(() => {
     const onVisibilityChange = () => {
       if (!document.hidden && songsRef.current.length) {
@@ -151,14 +195,14 @@ function App() {
       <img
         id="firstpicture"
         src={
-          songData?.image
-            ? `${BASE_URL}${songData.image}`
+          songs[currentSongIndex]?.image
+            ? `${BASE_URL}${songs[currentSongIndex].image}`
             : `${BASE_URL}images/red_tree.jpg`
         }
         alt=""
       />
 
-{/* shown when started is false, the ids are needed für CSS styling */}
+{/* shown when started is false, the ids are needed for CSS styling */}
       {!started && (
         <div id="start_screen">
           <img
@@ -174,7 +218,23 @@ function App() {
       )}
 
 {/* Gap countdown */}
-      {countdownText && <div id="countdown">{countdownText}</div>}
+      {countdownText && (
+        <>
+          <div id="countdown">{countdownText}</div>
+          {songs.length > 0 && (
+            <>
+              <h2 className="playlist_heading">Programm</h2>
+              <div id="playlist_preview">
+                <ol>
+                  {songs.map((song) => (
+                    <li key={song.file}>{song.title}</li>
+                  ))}
+                </ol>
+              </div>
+            </>
+          )}
+        </>
+      )}
       {gapCountdown != null && (
         <>
           <h2 id="title"> Es folgt: {songs[currentSongIndex]?.title}</h2>
@@ -214,6 +274,7 @@ function App() {
         ref={audioRef}
         src={songData?.audio ? `${BASE_URL}${songData.audio}` : undefined}
         onLoadedMetadata={handleLoadedMetadata}
+        onPlaying={handlePlaying}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
         controls

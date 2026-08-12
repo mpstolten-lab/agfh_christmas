@@ -1,7 +1,6 @@
 {
   "title": "Leise rieselt der Schnee",
   "audio": "audio/leise_rieselt_der_schnee.mp3",
-  "image": "",
   "lines": [
     { "text": "Leise rieselt der Schnee,",        "start":  16  },
     { "text": "still und starr ruht der See,",    "start": 24   },

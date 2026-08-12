@@ -1,7 +1,6 @@
 {
   "title": "Fröhliche Weihnacht überall",
   "audio": "audio/froehliche_weihnacht.mp3",
-  "image": "",
   "lines": [
     { "text": "Fröhliche Weihnacht überall!",           "start": 9   },
     { "text": "tönet durch die Lüfte froher Schall.",      "start": 12  },

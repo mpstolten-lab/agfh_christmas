@@ -1,7 +1,6 @@
 {
   "title": "O Tannenbaum",
   "audio": "audio/oh_tannenbaum.mp3",
-  "image": "images/tree.jpg",
   "lines": [
     { "text": "O Tannenbaum, o Tannenbaum, Wie grün sind deine Blätter!", "start": 0  },
     { "text": "Du grünst nicht nur zur Sommerzeit,",                      "start": 12 },
