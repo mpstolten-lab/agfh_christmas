@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import "./App.css";
 
-const eventDate = new Date("August 12, 2026 14:00:00").getTime();
+const eventDate = new Date("August 12, 2026 15:00:00").getTime();
 const GAP_SECONDS = 25;
 
 const SOFT_DRIFT_SECONDS = 0.3;        // threshold above which playback rate is gently adjusted
