@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect, useCallback, memo } from "react";
 import "./App.css";
 
-const eventDate = new Date("August 13, 2026 11:00:00").getTime();
+const eventDate = new Date("August 13, 2026 11:28:00").getTime();
 const GAP_SECONDS = 25;
 
-const SOFT_DRIFT_SECONDS = 0.3;        // threshold above which playback rate is gently adjusted
+const NUDGE_ON_SECONDS = 0.75;         // drift required to start a playbackRate correction
+const NUDGE_OFF_SECONDS = 0.3;         // drift below which a running correction stops (hysteresis, avoids flip-flopping every tick)
+const HARD_RESYNC_SECONDS = 3;         // threshold above which we jump straight to the expected position
 const NUDGE_RATE_PER_SECOND = 0.03;    // playback rate adjustment per second of drift
 const MAX_NUDGE_RATE = 0.06;           // cap so the adjustment stays unnoticeable
 const RESYNC_INTERVAL_MS = 1000;       // how often the playback position is checked
@@ -49,6 +51,8 @@ function App() {
   const audioRef = useRef(null);                    // the <audio> DOM element
   const scheduledStartRef = useRef(eventDate);       // shared start time of the current song
   const songsRef = useRef([]);                       // playlist, kept in sync with `songs` for use in callbacks
+  const isNudgingRef = useRef(false);                // whether a playbackRate correction is currently active (hysteresis)
+  const lastRateRef = useRef(1);                     // last playbackRate we actually wrote, so we don't rewrite it every tick
 
   // Fetches the data (lyrics/audio) for a song and resets line/gap state
   const loadSong = useCallback(async (index) => {
@@ -105,14 +109,24 @@ function App() {
   const handleLoadedMetadata = useCallback(() => {
     const audio = audioRef.current;
     audio.currentTime = getExpectedTime();
+    // the <audio> element is reused across songs, so a leftover nudge from
+    // the previous song's resync would otherwise carry over
+    audio.playbackRate = 1;
+    lastRateRef.current = 1;
+    isNudgingRef.current = false;
     audio.play();
   }, [getExpectedTime]);
 
-  // Fires once audio is actually playing; re-adjusts currentTime
+  // Fires whenever playback (re)starts - including after a buffering stall.
+  // Only hard-jump on large drift; small drift is left to the gentle
+  // playbackRate nudge in the resync interval below. Otherwise a stall
+  // caused by a slow connection triggers a jump into not-yet-buffered
+  // territory, which stalls again, which jumps further - a runaway loop
+  // that sounds like the audio suddenly speeding up.
   const handlePlaying = useCallback(() => {
     const audio = audioRef.current;
     const expected = getExpectedTime();
-    if (Math.abs(audio.currentTime - expected) > SOFT_DRIFT_SECONDS) {
+    if (Math.abs(audio.currentTime - expected) > HARD_RESYNC_SECONDS) {
       audio.currentTime = expected;
     }
   }, [getExpectedTime]);
@@ -137,12 +151,24 @@ function App() {
       if (!audio || audio.paused) return;
       const expected = getExpectedTime();
       const drift = audio.currentTime - expected; // >0: too far ahead, <0: behind
+      const absDrift = Math.abs(drift);
 
-      if (Math.abs(drift) > SOFT_DRIFT_SECONDS) {
-        const nudge = Math.min(Math.abs(drift) * NUDGE_RATE_PER_SECOND, MAX_NUDGE_RATE);
-        audio.playbackRate = drift > 0 ? 1 - nudge : 1 + nudge;
-      } else {
-        audio.playbackRate = 1;
+      // hysteresis: once nudging, keep going until drift drops below the
+      // lower (off) threshold, instead of the tight single threshold
+      // flip-flopping the rate on/off every tick - iOS audibly glitches
+      // on every playbackRate write, so we want as few writes as possible
+      const onThreshold = isNudgingRef.current ? NUDGE_OFF_SECONDS : NUDGE_ON_SECONDS;
+      isNudgingRef.current = absDrift > onThreshold;
+
+      const targetRate = isNudgingRef.current
+        ? drift > 0
+          ? 1 - Math.min(absDrift * NUDGE_RATE_PER_SECOND, MAX_NUDGE_RATE)
+          : 1 + Math.min(absDrift * NUDGE_RATE_PER_SECOND, MAX_NUDGE_RATE)
+        : 1;
+
+      if (Math.abs(targetRate - lastRateRef.current) > 0.005) {
+        audio.playbackRate = targetRate;
+        lastRateRef.current = targetRate;
       }
     }, RESYNC_INTERVAL_MS);
 
