@@ -46,6 +46,7 @@ function App() {
   const [currentLine, setCurrentLine] = useState(-1);            // index of the currently highlighted lyric line
   const [showEnd, setShowEnd] = useState(false);                // true once the playlist is finished
   const [gapCountdown, setGapCountdown] = useState(null);       // seconds left in the break; null = no break active
+  const [needsPlayTap, setNeedsPlayTap] = useState(false);      // true when the browser blocked autoplay and needs a tap to resume
 
   // references
   const audioRef = useRef(null);                    // the <audio> DOM element
@@ -72,6 +73,7 @@ function App() {
     setSongData(data);
     setCurrentLine(-1);
     setGapCountdown(null);
+    setNeedsPlayTap(false);
   }, [clearGapInterval]);
 
   // Counts down to the real timestamp `nextStart`, so it self-corrects after a standby gap
@@ -151,8 +153,14 @@ function App() {
     audio.playbackRate = 1;
     lastRateRef.current = 1;
     isNudgingRef.current = false;
-    audio.play();
+    // an autoplay started without a fresh user gesture (e.g. resuming after standby) can be blocked by the browser
+    audio.play().catch(() => setNeedsPlayTap(true));
   }, [getExpectedTime]);
+
+  // Lets the user manually resume playback after a blocked autoplay
+  const handleResumeTap = useCallback(() => {
+    audioRef.current?.play().then(() => setNeedsPlayTap(false)).catch(() => {});
+  }, []);
 
   // Fires whenever playback (re)starts - including after a buffering stall.
   // Only hard-jump on large drift; small drift is left to the gentle
@@ -333,6 +341,13 @@ function App() {
 
       {/* end component */}
       {showEnd && <div id="end">Vielen Dank fürs Mitsingen!</div>}
+
+      {/* shown when the browser blocked autoplay, e.g. after resuming from standby */}
+      {needsPlayTap && (
+        <button id="resumebutton" onClick={handleResumeTap}>
+          Ton fortsetzen
+        </button>
+      )}
 
       {/* audio component */}
       <audio
