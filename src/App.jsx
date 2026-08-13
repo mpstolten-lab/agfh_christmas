@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, memo } from "react";
 import "./App.css";
 
-const eventDate = new Date("August 13, 2026 08:32:00").getTime();
+const eventDate = new Date("August 13, 2026 11:00:00").getTime();
 const GAP_SECONDS = 25;
 
 const SOFT_DRIFT_SECONDS = 0.3;        // threshold above which playback rate is gently adjusted
@@ -10,6 +10,30 @@ const MAX_NUDGE_RATE = 0.06;           // cap so the adjustment stays unnoticeab
 const RESYNC_INTERVAL_MS = 1000;       // how often the playback position is checked
 
 const BASE_URL = import.meta.env.BASE_URL;
+
+// Renders only the +/-1 lyric lines around the active one; memoized so that
+// unrelated state changes elsewhere in App (countdown ticks, gap timer)
+// don't force this list to be recomputed and re-diffed on every render.
+const Lyrics = memo(function Lyrics({ lines, currentLine }) {
+  return (
+    <div id="lyrics">
+      {lines.map((line, i) => {
+        const visible = i >= currentLine - 1 && i <= currentLine + 1;
+        if (!visible) return null;
+        return (
+          <div
+            key={i}
+            id={`line-${i}`}
+            className="line active"
+            style={{ opacity: i === currentLine ? 1 : 0.4 }}
+          >
+            {line.text}
+          </div>
+        );
+      })}
+    </div>
+  );
+});
 
 function App() {
   const [started, setStarted] = useState(false);                // true once the start button was clicked
@@ -78,28 +102,31 @@ function App() {
   }, [currentSongIndex]);
 
   // Fires once the audio duration is known; jumps to the expected position and plays
-  const handleLoadedMetadata = () => {
+  const handleLoadedMetadata = useCallback(() => {
     const audio = audioRef.current;
     audio.currentTime = getExpectedTime();
     audio.play();
-  };
+  }, [getExpectedTime]);
 
-  // Fires once audio is actually playing; re-adjusts currentTime 
-  const handlePlaying = () => {
+  // Fires once audio is actually playing; re-adjusts currentTime
+  const handlePlaying = useCallback(() => {
     const audio = audioRef.current;
     const expected = getExpectedTime();
     if (Math.abs(audio.currentTime - expected) > SOFT_DRIFT_SECONDS) {
       audio.currentTime = expected;
     }
-  };
+  }, [getExpectedTime]);
 
   // Updates which lyric line is currently highlighted based on playback time
-  const handleTimeUpdate = () => {
+  const handleTimeUpdate = useCallback(() => {
     if (!songData) return;
     const t = audioRef.current.currentTime;
     const idx = songData.lines.findLastIndex((l) => t >= l.start);
-    setCurrentLine(idx);
-  };
+    // only trigger a re-render when the highlighted line actually changes;
+    // timeupdate fires several times a second, and re-rendering App on every
+    // tick regardless competes with iOS's already tight main-thread budget
+    setCurrentLine((prev) => (prev === idx ? prev : idx));
+  }, [songData]);
 
   // re-sync
   useEffect(() => {
@@ -124,7 +151,7 @@ function App() {
 
 
   // starts the gap countdown, then loads the next song or shows the end screen
-  const handleEnded = () => {
+  const handleEnded = useCallback(() => {
     const next = currentSongIndex + 1;
     const list = songsRef.current;
 
@@ -149,10 +176,10 @@ function App() {
       setSongData(null);
       setShowEnd(true);
     }
-  };
+  }, [currentSongIndex, loadSong]);
 
   // Runs the countdown to eventDate after clicking Start
-  const handleStartClick = () => {
+  const handleStartClick = useCallback(() => {
     setStarted(true);
 
     // Load the playlist already now, just to display the titles during the countdown
@@ -176,7 +203,7 @@ function App() {
         loadPlaylist();
       }
     }, 1000);
-  };
+  }, [loadPlaylist]);
 
   // Re-syncs playback when the tab returns from the background
   useEffect(() => {
@@ -247,22 +274,7 @@ function App() {
       {songData && (
         <>
           <h2 id="title">{songData.title}</h2>
-          <div id="lyrics">
-            {songData.lines.map((line, i) => {
-              const visible = i >= currentLine - 1 && i <= currentLine + 1;
-              if (!visible) return null;
-              return (
-                <div
-                  key={i}
-                  id={`line-${i}`}
-                  className="line active"
-                  style={{ opacity: i === currentLine ? 1 : 0.4 }}
-                >
-                  {line.text}
-                </div>
-              );
-            })}
-          </div>
+          <Lyrics lines={songData.lines} currentLine={currentLine} />
         </>
       )}
 
@@ -273,6 +285,7 @@ function App() {
       <audio
         ref={audioRef}
         src={songData?.audio ? `${BASE_URL}${songData.audio}` : undefined}
+        preload="auto"
         onLoadedMetadata={handleLoadedMetadata}
         onPlaying={handlePlaying}
         onTimeUpdate={handleTimeUpdate}
