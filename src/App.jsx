@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, memo } from "react";
 import "./App.css";
 
-const eventDate = new Date("August 13, 2026 11:28:00").getTime();
+const eventDate = new Date("August 13, 2026 12:06:00").getTime();
 const GAP_SECONDS = 25;
 
 const NUDGE_ON_SECONDS = 0.75;         // drift required to start a playbackRate correction
@@ -53,16 +53,47 @@ function App() {
   const songsRef = useRef([]);                       // playlist, kept in sync with `songs` for use in callbacks
   const isNudgingRef = useRef(false);                // whether a playbackRate correction is currently active (hysteresis)
   const lastRateRef = useRef(1);                     // last playbackRate we actually wrote, so we don't rewrite it every tick
+  const gapIntervalRef = useRef(null);               // interval id of the currently running gap countdown, if any
+
+  // Stops a stale gap countdown left running from before a standby/reload resync
+  const clearGapInterval = useCallback(() => {
+    if (gapIntervalRef.current) {
+      clearInterval(gapIntervalRef.current);
+      gapIntervalRef.current = null;
+    }
+  }, []);
 
   // Fetches the data (lyrics/audio) for a song and resets line/gap state
   const loadSong = useCallback(async (index) => {
+    clearGapInterval();
     const list = songsRef.current;
     const response = await fetch(`${BASE_URL}${list[index].file}`);
     const data = await response.json();
     setSongData(data);
     setCurrentLine(-1);
     setGapCountdown(null);
-  }, []);
+  }, [clearGapInterval]);
+
+  // Counts down to the real timestamp `nextStart`, so it self-corrects after a standby gap
+  const startGapCountdown = useCallback((nextIndex, nextStart) => {
+    clearGapInterval();
+    setCurrentSongIndex(nextIndex);
+
+    const tick = () => {
+      const remaining = Math.ceil((nextStart - Date.now()) / 1000);
+      if (remaining <= 0) {
+        clearGapInterval();
+        setGapCountdown(null);
+        scheduledStartRef.current = nextStart;
+        loadSong(nextIndex);
+      } else {
+        setGapCountdown(remaining);
+      }
+    };
+
+    tick();
+    gapIntervalRef.current = setInterval(tick, 1000);
+  }, [loadSong, clearGapInterval]);
 
   // Loads the playlist and figures out which song should be playing right now
   const loadPlaylist = useCallback(async () => {
@@ -84,8 +115,14 @@ function App() {
       index++;
     }
 
-    // if the last song is already over, show the end screen
-    if (Date.now() >= scheduledStart + list[index].duration * 1000) {
+    const songEnd = scheduledStart + list[index].duration * 1000;
+
+    // song's audio already over: either we're in the pause, or (if last song) the playlist is done
+    if (Date.now() >= songEnd) {
+      if (index < list.length - 1) {
+        startGapCountdown(index + 1, songEnd + GAP_SECONDS * 1000);
+        return;
+      }
       setShowEnd(true);
       return;
     }
@@ -93,7 +130,7 @@ function App() {
     scheduledStartRef.current = scheduledStart;
     setCurrentSongIndex(index);
     loadSong(index);
-  }, [loadSong]);
+  }, [loadSong, startGapCountdown]);
 
   // Calculates where in the song we should be right now, based on the shared start time
   const getExpectedTime = useCallback(() => {
@@ -182,27 +219,17 @@ function App() {
     const list = songsRef.current;
 
     if (next < list.length) {
-      setSongData(null); 
-      setCurrentSongIndex(next);
-
-      let count = GAP_SECONDS;
-      setGapCountdown(count);
-      const puffer = setInterval(() => {
-        count -= 1;
-        setGapCountdown(count);
-        if (count <= 0) {
-          clearInterval(puffer);
-          setGapCountdown(null);
-
-          scheduledStartRef.current = Date.now();
-          loadSong(next);
-        }
-      }, 1000);
+      setSongData(null);
+      const nextStart =
+        scheduledStartRef.current +
+        list[currentSongIndex].duration * 1000 +
+        GAP_SECONDS * 1000;
+      startGapCountdown(next, nextStart);
     } else {
       setSongData(null);
       setShowEnd(true);
     }
-  }, [currentSongIndex, loadSong]);
+  }, [currentSongIndex, startGapCountdown]);
 
   // Runs the countdown to eventDate after clicking Start
   const handleStartClick = useCallback(() => {
