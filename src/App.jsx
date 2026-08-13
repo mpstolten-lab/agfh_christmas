@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, memo } from "react";
 import "./App.css";
 
-const eventDate = new Date("August 13, 2026 12:06:00").getTime();
+const eventDate = new Date("August 13, 2026 12:26:00").getTime();
 const GAP_SECONDS = 25;
 
 const NUDGE_ON_SECONDS = 0.75;         // drift required to start a playbackRate correction
@@ -46,7 +46,6 @@ function App() {
   const [currentLine, setCurrentLine] = useState(-1);            // index of the currently highlighted lyric line
   const [showEnd, setShowEnd] = useState(false);                // true once the playlist is finished
   const [gapCountdown, setGapCountdown] = useState(null);       // seconds left in the break; null = no break active
-  const [needsPlayTap, setNeedsPlayTap] = useState(false);      // true when the browser blocked autoplay and needs a tap to resume
 
   // references
   const audioRef = useRef(null);                    // the <audio> DOM element
@@ -55,6 +54,16 @@ function App() {
   const isNudgingRef = useRef(false);                // whether a playbackRate correction is currently active (hysteresis)
   const lastRateRef = useRef(1);                     // last playbackRate we actually wrote, so we don't rewrite it every tick
   const gapIntervalRef = useRef(null);               // interval id of the currently running gap countdown, if any
+  const wakeLockRef = useRef(null);                   // active Screen Wake Lock sentinel, if any
+
+  // Keeps the screen from auto-locking, so the gap countdown/next song never has to fight standby; silently no-ops if unsupported
+  const requestWakeLock = useCallback(async () => {
+    try {
+      wakeLockRef.current = await navigator.wakeLock?.request("screen");
+    } catch {
+      wakeLockRef.current = null;
+    }
+  }, []);
 
   // Stops a stale gap countdown left running from before a standby/reload resync
   const clearGapInterval = useCallback(() => {
@@ -73,7 +82,6 @@ function App() {
     setSongData(data);
     setCurrentLine(-1);
     setGapCountdown(null);
-    setNeedsPlayTap(false);
   }, [clearGapInterval]);
 
   // Counts down to the real timestamp `nextStart`, so it self-corrects after a standby gap
@@ -153,14 +161,8 @@ function App() {
     audio.playbackRate = 1;
     lastRateRef.current = 1;
     isNudgingRef.current = false;
-    // an autoplay started without a fresh user gesture (e.g. resuming after standby) can be blocked by the browser
-    audio.play().catch(() => setNeedsPlayTap(true));
+    audio.play();
   }, [getExpectedTime]);
-
-  // Lets the user manually resume playback after a blocked autoplay
-  const handleResumeTap = useCallback(() => {
-    audioRef.current?.play().then(() => setNeedsPlayTap(false)).catch(() => {});
-  }, []);
 
   // Fires whenever playback (re)starts - including after a buffering stall.
   // Only hard-jump on large drift; small drift is left to the gentle
@@ -242,6 +244,7 @@ function App() {
   // Runs the countdown to eventDate after clicking Start
   const handleStartClick = useCallback(() => {
     setStarted(true);
+    requestWakeLock();
 
     // Load the playlist already now, just to display the titles during the countdown
     fetch(`${BASE_URL}data/playlist.json`)
@@ -264,19 +267,20 @@ function App() {
         loadPlaylist();
       }
     }, 1000);
-  }, [loadPlaylist]);
+  }, [loadPlaylist, requestWakeLock]);
 
-  // Re-syncs playback when the tab returns from the background
+  // Re-syncs playback and re-acquires the wake lock when the tab returns from the background
   useEffect(() => {
     const onVisibilityChange = () => {
-      if (!document.hidden && songsRef.current.length) {
-        loadPlaylist();
+      if (!document.hidden) {
+        requestWakeLock();
+        if (songsRef.current.length) loadPlaylist();
       }
     };
     document.addEventListener("visibilitychange", onVisibilityChange);
     return () =>
       document.removeEventListener("visibilitychange", onVisibilityChange);
-  }, [loadPlaylist]);
+  }, [loadPlaylist, requestWakeLock]);
 
   return (
     <div id="container">
@@ -341,13 +345,6 @@ function App() {
 
       {/* end component */}
       {showEnd && <div id="end">Vielen Dank fürs Mitsingen!</div>}
-
-      {/* shown when the browser blocked autoplay, e.g. after resuming from standby */}
-      {needsPlayTap && (
-        <button id="resumebutton" onClick={handleResumeTap}>
-          Ton fortsetzen
-        </button>
-      )}
 
       {/* audio component */}
       <audio
