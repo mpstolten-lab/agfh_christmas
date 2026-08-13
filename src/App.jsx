@@ -54,16 +54,6 @@ function App() {
   const isNudgingRef = useRef(false);                // whether a playbackRate correction is currently active (hysteresis)
   const lastRateRef = useRef(1);                     // last playbackRate we actually wrote, so we don't rewrite it every tick
   const gapIntervalRef = useRef(null);               // interval id of the currently running gap countdown, if any
-  const wakeLockRef = useRef(null);                   // active Screen Wake Lock sentinel, if any
-
-  // Keeps the screen from auto-locking, so the gap countdown/next song never has to fight standby; silently no-ops if unsupported
-  const requestWakeLock = useCallback(async () => {
-    try {
-      wakeLockRef.current = await navigator.wakeLock?.request("screen");
-    } catch {
-      wakeLockRef.current = null;
-    }
-  }, []);
 
   // Stops a stale gap countdown left running from before a standby/reload resync
   const clearGapInterval = useCallback(() => {
@@ -244,7 +234,6 @@ function App() {
   // Runs the countdown to eventDate after clicking Start
   const handleStartClick = useCallback(() => {
     setStarted(true);
-    requestWakeLock();
 
     // Load the playlist already now, just to display the titles during the countdown
     fetch(`${BASE_URL}data/playlist.json`)
@@ -267,20 +256,19 @@ function App() {
         loadPlaylist();
       }
     }, 1000);
-  }, [loadPlaylist, requestWakeLock]);
+  }, [loadPlaylist]);
 
-  // Re-syncs playback and re-acquires the wake lock when the tab returns from the background
+  // Re-syncs playback when the tab returns from the background
   useEffect(() => {
     const onVisibilityChange = () => {
-      if (!document.hidden) {
-        requestWakeLock();
-        if (songsRef.current.length) loadPlaylist();
+      if (!document.hidden && songsRef.current.length) {
+        loadPlaylist();
       }
     };
     document.addEventListener("visibilitychange", onVisibilityChange);
     return () =>
       document.removeEventListener("visibilitychange", onVisibilityChange);
-  }, [loadPlaylist, requestWakeLock]);
+  }, [loadPlaylist]);
 
   return (
     <div id="container">
