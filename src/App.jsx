@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, memo } from "react";
 import "./App.css";
 
-const eventDate = new Date("August 17, 2026 13:30:00").getTime();
+const eventDate = new Date("August 18, 2026 09:45:00").getTime();
 const GAP_SECONDS = 25;
 
 const NUDGE_ON_SECONDS = 0.75;         // Start correcting if audio is more than 0.75s off
