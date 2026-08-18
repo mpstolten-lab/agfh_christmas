@@ -1,21 +1,19 @@
 import { useState, useRef, useEffect, useCallback, memo } from "react";
 import "./App.css";
 
-const eventDate = new Date("August 13, 2026 12:26:00").getTime();
+const eventDate = new Date("August 17, 2026 13:30:00").getTime();
 const GAP_SECONDS = 25;
 
-const NUDGE_ON_SECONDS = 0.75;         // drift required to start a playbackRate correction
-const NUDGE_OFF_SECONDS = 0.3;         // drift below which a running correction stops (hysteresis, avoids flip-flopping every tick)
-const HARD_RESYNC_SECONDS = 3;         // threshold above which we jump straight to the expected position
-const NUDGE_RATE_PER_SECOND = 0.03;    // playback rate adjustment per second of drift
-const MAX_NUDGE_RATE = 0.06;           // cap so the adjustment stays unnoticeable
-const RESYNC_INTERVAL_MS = 1000;       // how often the playback position is checked
+const NUDGE_ON_SECONDS = 0.75;         // Start correcting if audio is more than 0.75s off
+const NUDGE_OFF_SECONDS = 0.3;         // Stop correcting once drift is below 0.3s 
+const HARD_RESYNC_SECONDS = 3;         // If drift is more than 3s, jump directly instead of correcting gradually
+const NUDGE_RATE_PER_SECOND = 0.03;    // How much to speed up or slow down per second of drift
+const MAX_NUDGE_RATE = 0.06;           // Maximum speed adjustment, so the correction stays inaudible
+const RESYNC_INTERVAL_MS = 1000;       // Check sync every 1000ms (once per second)
 
 const BASE_URL = import.meta.env.BASE_URL;
 
-// Renders only the +/-1 lyric lines around the active one; memoized so that
-// unrelated state changes elsewhere in App (countdown ticks, gap timer)
-// don't force this list to be recomputed and re-diffed on every render.
+// Renders only the +/-1 lines around the active one
 const Lyrics = memo(function Lyrics({ lines, currentLine }) {
   return (
     <div id="lyrics">
@@ -39,8 +37,8 @@ const Lyrics = memo(function Lyrics({ lines, currentLine }) {
 
 function App() {
   const [started, setStarted] = useState(false);                // true once the start button was clicked
-  const [countdownText, setCountdownText] = useState("");       // formatted countdown text until eventDate
-  const [songs, setSongs] = useState([]);                       // full playlist, for the title list display
+  const [countdownText, setCountdownText] = useState("");       // Countdown
+  const [songs, setSongs] = useState([]);                       // Playlist
   const [currentSongIndex, setCurrentSongIndex] = useState(0);  // index of the song currently playing
   const [songData, setSongData] = useState(null);               // loaded JSON (lyrics/audio) of the current song
   const [currentLine, setCurrentLine] = useState(-1);            // index of the currently highlighted lyric line
@@ -48,14 +46,14 @@ function App() {
   const [gapCountdown, setGapCountdown] = useState(null);       // seconds left in the break; null = no break active
 
   // references
-  const audioRef = useRef(null);                    // the <audio> DOM element
+  const audioRef = useRef(null);                    // the <audio DOM element
   const scheduledStartRef = useRef(eventDate);       // shared start time of the current song
   const songsRef = useRef([]);                       // playlist, kept in sync with `songs` for use in callbacks
   const isNudgingRef = useRef(false);                // whether a playbackRate correction is currently active (hysteresis)
   const lastRateRef = useRef(1);                     // last playbackRate we actually wrote, so we don't rewrite it every tick
   const gapIntervalRef = useRef(null);               // interval id of the currently running gap countdown, if any
 
-  // Stops a stale gap countdown left running from before a standby/reload resync
+  // Stops gap countdown from before a standby or reload resync
   const clearGapInterval = useCallback(() => {
     if (gapIntervalRef.current) {
       clearInterval(gapIntervalRef.current);
@@ -63,7 +61,7 @@ function App() {
     }
   }, []);
 
-  // Fetches the data (lyrics/audio) for a song and resets line/gap state
+  // Fetches the data for a song and resets line/gap 
   const loadSong = useCallback(async (index) => {
     clearGapInterval();
     const list = songsRef.current;
@@ -74,25 +72,25 @@ function App() {
     setGapCountdown(null);
   }, [clearGapInterval]);
 
-  // Counts down to the real timestamp `nextStart`, so it self-corrects after a standby gap
+  // Counts down to the next song's start time and loads it when the countdown reaches zero
   const startGapCountdown = useCallback((nextIndex, nextStart) => {
-    clearGapInterval();
-    setCurrentSongIndex(nextIndex);
+    clearGapInterval();             // stop any existing gap countdown
+    setCurrentSongIndex(nextIndex); // switch to the next song index
 
     const tick = () => {
-      const remaining = Math.ceil((nextStart - Date.now()) / 1000);
+      const remaining = Math.ceil((nextStart - Date.now()) / 1000); // seconds left until next song
       if (remaining <= 0) {
-        clearGapInterval();
-        setGapCountdown(null);
-        scheduledStartRef.current = nextStart;
-        loadSong(nextIndex);
+        clearGapInterval();                    // stop the interval
+        setGapCountdown(null);                 // hide the countdown
+        scheduledStartRef.current = nextStart; // save the start time of the next song
+        loadSong(nextIndex);                   // load and play the next song
       } else {
-        setGapCountdown(remaining);
+        setGapCountdown(remaining); // update the countdown display
       }
     };
 
-    tick();
-    gapIntervalRef.current = setInterval(tick, 1000);
+    tick();                                          // run once immediately
+    gapIntervalRef.current = setInterval(tick, 1000); // then repeat every second
   }, [loadSong, clearGapInterval]);
 
   // Loads the playlist and figures out which song should be playing right now
@@ -106,7 +104,7 @@ function App() {
     let index = 0;
     const list = playlist.songs;
 
-    // advance until we reach the song that should currently be playing
+    // Determines which should be playing
     while (
       index < list.length - 1 &&
       Date.now() >= scheduledStart + (list[index].duration + GAP_SECONDS) * 1000
@@ -115,9 +113,9 @@ function App() {
       index++;
     }
 
-    const songEnd = scheduledStart + list[index].duration * 1000;
+    const songEnd = scheduledStart + list[index].duration * 1000;  //determines when song should end
 
-    // song's audio already over: either we're in the pause, or (if last song) the playlist is done
+    // songs audio already over: in the pause, or the playlist done
     if (Date.now() >= songEnd) {
       if (index < list.length - 1) {
         startGapCountdown(index + 1, songEnd + GAP_SECONDS * 1000);
@@ -142,24 +140,17 @@ function App() {
     );
   }, [currentSongIndex]);
 
-  // Fires once the audio duration is known; jumps to the expected position and plays
+  //jumps where audio should be an resets speed up
   const handleLoadedMetadata = useCallback(() => {
     const audio = audioRef.current;
     audio.currentTime = getExpectedTime();
-    // the <audio> element is reused across songs, so a leftover nudge from
-    // the previous song's resync would otherwise carry over
     audio.playbackRate = 1;
     lastRateRef.current = 1;
     isNudgingRef.current = false;
     audio.play();
   }, [getExpectedTime]);
 
-  // Fires whenever playback (re)starts - including after a buffering stall.
-  // Only hard-jump on large drift; small drift is left to the gentle
-  // playbackRate nudge in the resync interval below. Otherwise a stall
-  // caused by a slow connection triggers a jump into not-yet-buffered
-  // territory, which stalls again, which jumps further - a runaway loop
-  // that sounds like the audio suddenly speeding up.
+  // hard resync if difference is over 3 sec
   const handlePlaying = useCallback(() => {
     const audio = audioRef.current;
     const expected = getExpectedTime();
@@ -173,44 +164,46 @@ function App() {
     if (!songData) return;
     const t = audioRef.current.currentTime;
     const idx = songData.lines.findLastIndex((l) => t >= l.start);
-    // only trigger a re-render when the highlighted line actually changes;
-    // timeupdate fires several times a second, and re-rendering App on every
-    // tick regardless competes with iOS's already tight main-thread budget
+    // only re-render when the line actually changes (ios optimisation)
     setCurrentLine((prev) => (prev === idx ? prev : idx));
   }, [songData]);
 
-  // re-sync
-  useEffect(() => {
-    if (!songData) return;
 
-    const interval = setInterval(() => {
-      const audio = audioRef.current;
-      if (!audio || audio.paused) return;
-      const expected = getExpectedTime();
-      const drift = audio.currentTime - expected; // >0: too far ahead, <0: behind
-      const absDrift = Math.abs(drift);
+ useEffect(() => {
+  if (!songData) return;
 
-      // hysteresis: once nudging, keep going until drift drops below the
-      // lower (off) threshold, instead of the tight single threshold
-      // flip-flopping the rate on/off every tick - iOS audibly glitches
-      // on every playbackRate write, so we want as few writes as possible
-      const onThreshold = isNudgingRef.current ? NUDGE_OFF_SECONDS : NUDGE_ON_SECONDS;
-      isNudgingRef.current = absDrift > onThreshold;
+  const interval = setInterval(() => {
+    const audio = audioRef.current;
+    if (!audio || audio.paused) return;
 
-      const targetRate = isNudgingRef.current
-        ? drift > 0
-          ? 1 - Math.min(absDrift * NUDGE_RATE_PER_SECOND, MAX_NUDGE_RATE)
-          : 1 + Math.min(absDrift * NUDGE_RATE_PER_SECOND, MAX_NUDGE_RATE)
-        : 1;
+    const expected = getExpectedTime();
+    const drift = audio.currentTime - expected;
+    const absDrift = Math.abs(drift);
 
-      if (Math.abs(targetRate - lastRateRef.current) > 0.005) {
-        audio.playbackRate = targetRate;
-        lastRateRef.current = targetRate;
-      }
-    }, RESYNC_INTERVAL_MS);
+    const onThreshold = isNudgingRef.current ? NUDGE_OFF_SECONDS : NUDGE_ON_SECONDS;
+    isNudgingRef.current = absDrift > onThreshold;
 
-    return () => clearInterval(interval);
-  }, [songData, getExpectedTime]);
+    let targetRate;
+
+    if (!isNudgingRef.current) {
+      // no correction needed
+      targetRate = 1;
+    } else if (drift > 0) {
+      // To far ahead, plays slower
+      targetRate = 1 - Math.min(absDrift * NUDGE_RATE_PER_SECOND, MAX_NUDGE_RATE);
+    } else {
+      // Audio too far behind, plays faster
+      targetRate = 1 + Math.min(absDrift * NUDGE_RATE_PER_SECOND, MAX_NUDGE_RATE);
+    }
+
+    if (Math.abs(targetRate - lastRateRef.current) > 0.005) {
+      audio.playbackRate = targetRate;
+      lastRateRef.current = targetRate;
+    }
+  }, RESYNC_INTERVAL_MS);
+
+  return () => clearInterval(interval);
+}, [songData, getExpectedTime]);
 
 
   // starts the gap countdown, then loads the next song or shows the end screen
@@ -258,7 +251,7 @@ function App() {
     }, 1000);
   }, [loadPlaylist]);
 
-  // Re-syncs playback when the tab returns from the background
+  // Re-syncs playback when the tab returns from the background 
   useEffect(() => {
     const onVisibilityChange = () => {
       if (!document.hidden && songsRef.current.length) {
@@ -282,7 +275,7 @@ function App() {
         alt=""
       />
 
-{/* shown when started is false, the ids are needed for CSS styling */}
+      {/* shown when started is false, the ids are needed for CSS styling */}
       {!started && (
         <div id="start_screen">
           <img
@@ -297,7 +290,7 @@ function App() {
         </div>
       )}
 
-{/* Gap countdown */}
+      {/* Gap countdown */}
       {countdownText && (
         <>
           <div id="countdown">{countdownText}</div>
