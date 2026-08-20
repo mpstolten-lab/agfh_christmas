@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zeitstempel-Tool</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>🎄 Zeitstempel-Tool</h1>
+      <p class="subtitle">
+        Audio + Liedtext eingeben &rarr; Zeiten werden geschätzt &rarr; auf der Wellenform per Drag
+        feinjustieren &rarr; fertiges JSON exportieren.
+      </p>
+    </header>
+
+    <main>
+      <section id="input-panel" class="panel">
+        <h2>1. Eingabe</h2>
+
+        <label>
+          Songtitel
+          <input type="text" id="titleInput" placeholder="z. B. Stille Nacht" />
+        </label>
+
+        <label>
+          Audiodatei
+          <input type="file" id="audioFileInput" accept="audio/*" />
+        </label>
+
+        <label>
+          Audio-Dateiname (im Projekt, unter <code>public/audio/</code>)
+          <input type="text" id="audioPathInput" list="audioSuggestions" placeholder="z. B. stille_nacht.mp3" />
+          <datalist id="audioSuggestions">
+            <!-- AUTO-GENERATED:AUDIO:START -->
+            <option value="feliz_navidad.mp3"></option>
+            <option value="froehliche_weihnacht.mp3"></option>
+            <option value="ihr_kinderlein.mp3"></option>
+            <option value="kling_gloeckchen.mp3"></option>
+            <option value="lasst_uns_froh.mp3"></option>
+            <option value="leise_rieselt_der_schnee.mp3"></option>
+            <option value="oh_du_froehliche.mp3"></option>
+            <option value="oh_tannenbaum.mp3"></option>
+            <option value="stille_nacht.mp3"></option>
+            <option value="we_wish_you.mp3"></option>
+            <!-- AUTO-GENERATED:AUDIO:END -->
+          </datalist>
+        </label>
+
+        <label>
+          Bild (unter <code>public/images/</code>)
+          <input type="text" id="imagePathInput" list="imageSuggestions" placeholder="z. B. red_tree.jpg" />
+          <datalist id="imageSuggestions">
+            <!-- AUTO-GENERATED:IMAGES:START -->
+            <option value="agfh_logo.png"></option>
+            <option value="christmas_market.jpg"></option>
+            <option value="cookies.jpg"></option>
+            <option value="red_tree.jpg"></option>
+            <option value="tree.jpg"></option>
+            <!-- AUTO-GENERATED:IMAGES:END -->
+          </datalist>
+        </label>
+
+        <div class="row">
+          <label>
+            Intro (s)
+            <input type="number" id="introInput" value="2" min="0" step="0.5" />
+          </label>
+          <label>
+            Outro (s)
+            <input type="number" id="outroInput" value="2" min="0" step="0.5" />
+          </label>
+        </div>
+
+        <label>
+          Liedtext (eine Zeile pro Zeile)
+          <textarea id="lyricsInput" rows="14" placeholder="Stille Nacht, heilige Nacht!&#10;Alles schläft, einsam wacht&#10;..."></textarea>
+        </label>
+      </section>
+
+      <section id="editor-panel" class="panel">
+        <h2>2. Wellenform &amp; Feinjustierung</h2>
+
+        <div id="playerBar">
+          <button id="playBtn" disabled>▶</button>
+          <span id="timeReadout">0:00.0 / 0:00.0</span>
+          <button id="reestimateBtn" disabled>🔄 Neu schätzen</button>
+        </div>
+
+        <div id="waveformContainer">
+          <canvas id="waveformCanvas"></canvas>
+          <div id="markerLayer"></div>
+          <div id="playhead"></div>
+          <div id="emptyState">Audiodatei laden, um die Wellenform zu sehen.</div>
+        </div>
+        <p class="hint">
+          Rote Linie = Songende (bestimmt <code>duration</code>). Blaue Linien = Zeilen, per Drag verschiebbar.
+          Klick auf die Wellenform spult. Leertaste = Play/Pause.
+        </p>
+
+        <ol id="lineList"></ol>
+      </section>
+
+      <section id="output-panel" class="panel">
+        <h2>3. Export</h2>
+
+        <div class="output-block">
+          <div class="output-header">
+            <h3 id="songFileName">data/song.json</h3>
+            <div>
+              <button id="copySongJsonBtn">📋 Kopieren</button>
+              <button id="downloadSongJsonBtn">⬇ Download</button>
+            </div>
+          </div>
+          <pre id="songJsonOutput">{}</pre>
+        </div>
+
+        <div class="output-block">
+          <div class="output-header">
+            <h3>Eintrag für playlist.json</h3>
+            <button id="copyPlaylistJsonBtn">📋 Kopieren</button>
+          </div>
+          <pre id="playlistJsonOutput">{}</pre>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

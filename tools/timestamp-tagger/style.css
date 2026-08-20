@@ -1,0 +1,349 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #14181f;
+  color: #e8ecf1;
+  padding: 24px;
+}
+
+header {
+  max-width: 1200px;
+  margin: 0 auto 20px;
+}
+
+header h1 {
+  margin: 0 0 4px;
+  font-size: 1.6rem;
+}
+
+.subtitle {
+  margin: 0;
+  color: #9aa4b2;
+  font-size: 0.9rem;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  grid-template-rows: auto auto;
+  gap: 16px;
+}
+
+#input-panel {
+  grid-row: 1 / 3;
+}
+
+#editor-panel {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+#output-panel {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+@media (max-width: 900px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+  #input-panel,
+  #editor-panel,
+  #output-panel {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+.panel {
+  background: #1c222c;
+  border: 1px solid #2b3341;
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+.panel h2 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+  color: #c94f4f;
+}
+
+label {
+  display: block;
+  font-size: 0.82rem;
+  color: #9aa4b2;
+  margin-bottom: 12px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+}
+
+.row label {
+  flex: 1;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="file"],
+textarea {
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 10px;
+  background: #101419;
+  border: 1px solid #2b3341;
+  border-radius: 6px;
+  color: #e8ecf1;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+code {
+  background: #101419;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+button {
+  background: #2b3341;
+  color: #e8ecf1;
+  border: 1px solid #3a4557;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: #3a4557;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+#playBtn {
+  font-size: 1rem;
+  padding: 6px 14px;
+}
+
+#playerBar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+#timeReadout {
+  font-variant-numeric: tabular-nums;
+  color: #9aa4b2;
+  font-size: 0.85rem;
+}
+
+#reestimateBtn {
+  margin-left: auto;
+}
+
+#waveformContainer {
+  position: relative;
+  height: 140px;
+  background: #101419;
+  border: 1px solid #2b3341;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+#waveformCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#emptyState {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5a6577;
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+#markerLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #4f8fc9;
+  cursor: ew-resize;
+  pointer-events: auto;
+}
+
+.marker.touched {
+  background: #6fd17a;
+}
+
+.marker::before {
+  content: attr(data-index);
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 0.65rem;
+  background: #4f8fc9;
+  color: #101419;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.marker.touched::before {
+  background: #6fd17a;
+}
+
+.marker.duration-marker {
+  width: 3px;
+  background: #c94f4f;
+  z-index: 2;
+}
+
+.marker.duration-marker::before {
+  content: "Ende";
+  background: #c94f4f;
+  color: #101419;
+  top: unset;
+  bottom: 2px;
+}
+
+#playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #f2d675;
+  pointer-events: none;
+  left: 0;
+}
+
+.hint {
+  font-size: 0.78rem;
+  color: #5a6577;
+  margin: 8px 0 14px;
+}
+
+#lineList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+#lineList li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 4px;
+  border-bottom: 1px solid #232a35;
+  font-size: 0.85rem;
+}
+
+#lineList li .idx {
+  color: #5a6577;
+  width: 18px;
+  flex-shrink: 0;
+}
+
+#lineList li .text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#lineList li .time {
+  font-variant-numeric: tabular-nums;
+  color: #9aa4b2;
+  width: 70px;
+  flex-shrink: 0;
+}
+
+#lineList li.active {
+  background: #232a35;
+}
+
+#lineList li .nudge {
+  display: flex;
+  gap: 2px;
+}
+
+#lineList li .nudge button {
+  padding: 2px 6px;
+  font-size: 0.7rem;
+}
+
+#lineList li .resetBtn {
+  padding: 2px 6px;
+  font-size: 0.7rem;
+}
+
+.output-block {
+  margin-bottom: 16px;
+}
+
+.output-block:last-child {
+  margin-bottom: 0;
+}
+
+.output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.output-header h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #9aa4b2;
+  font-weight: 500;
+}
+
+.output-header div {
+  display: flex;
+  gap: 8px;
+}
+
+pre {
+  margin: 0;
+  background: #101419;
+  border: 1px solid #2b3341;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
